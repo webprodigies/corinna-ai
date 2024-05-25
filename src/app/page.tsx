@@ -1,113 +1,147 @@
-import Image from "next/image";
+import { onGetBlogPosts } from '@/actions/landing'
+import NavBar from '@/components/navbar'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { pricingCards } from '@/constants/landing-page'
+import clsx from 'clsx'
+import { ArrowRightCircleIcon, Check } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
+import parse from 'html-react-parser'
+import { getMonthName } from '@/lib/utils'
 
-export default function Home() {
+export default async function Home() {
+  const posts:
+    | {
+        id: string
+        title: string
+        image: string
+        content: string
+        createdAt: Date
+      }[]
+    | undefined = await onGetBlogPosts()
+  console.log(posts)
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <main>
+      <NavBar />
+      <section>
+        <div className="flex items-center justify-center flex-col mt-[80px] gap-4 ">
+          <span className="text-orange bg-orange/20 px-4 py-2 rounded-full text-sm">
+            An AI powered sales assistant chatbot
+          </span>
+          <Image
+            src="/images/corinna-ai-logo.png"
+            width={500}
+            height={100}
+            alt="Logo"
+            className="max-w-lg object-contain"
+          />
+          <p className="text-center max-w-[500px]">
+            Your AI powered sales assistant! Embed Corinna AI into any website
+            with just a snippet of code!
+          </p>
+          <Button className="bg-orange font-bold text-white px-4">
+            Start For Free
+          </Button>
+          <Image
+            src="/images/iphonecorinna.png"
+            width={400}
+            height={100}
+            alt="Logo"
+            className="max-w-lg object-contain"
+          />
         </div>
+      </section>
+      <section className="flex justify-center items-center flex-col gap-4 mt-10">
+        <h2 className="text-4xl text-center"> Choose what fits you right</h2>
+        <p className="text-muted-foreground text-center max-w-lg">
+          Our straightforward pricing plans are tailored to meet your needs. If
+          {" you're"} not ready to commit you can get started for free.
+        </p>
+      </section>
+      <div className="flex  justify-center gap-4 flex-wrap mt-6">
+        {pricingCards.map((card) => (
+          <Card
+            key={card.title}
+            className={clsx('w-[300px] flex flex-col justify-between', {
+              'border-2 border-primary': card.title === 'Unlimited',
+            })}
+          >
+            <CardHeader>
+              <CardTitle className="text-orange">{card.title}</CardTitle>
+              <CardDescription>
+                {pricingCards.find((c) => c.title === card.title)?.description}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <span className="text-4xl font-bold">{card.price}</span>
+              <span className="text-muted-foreground">
+                <span>/ month</span>
+              </span>
+            </CardContent>
+            <CardFooter className="flex flex-col items-start gap-4">
+              <div>
+                {card.features.map((feature) => (
+                  <div
+                    key={feature}
+                    className="flex gap-2"
+                  >
+                    <Check />
+                    <p>{feature}</p>
+                  </div>
+                ))}
+              </div>
+              <Link
+                href={`/dashbord?plan=${card.title}`}
+                className="bg-[#f3d299] border-orange border-2 p-2 w-full text-center font-bold rounded-md"
+              >
+                Get Started
+              </Link>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      <section className="flex justify-center items-center flex-col gap-4 mt-28">
+        <h2 className="text-4xl text-center">News Room</h2>
+        <p className="text-muted-foreground text-center max-w-lg">
+          Explore our insights on AI, technology, and optimizing your business.
+        </p>
+      </section>
+      <section className="md:grid-cols-3 grid-cols-1 grid gap-5 container mt-8">
+        {posts &&
+          posts.map((post) => (
+            <Link
+              href={`/blogs/${post.id}`}
+              key={post.id}
+            >
+              <Card className="flex flex-col gap-2 rounded-xl overflow-hidden h-full hover:bg-gray-100">
+                <div className="relative w-full aspect-video">
+                  <Image
+                    src={`${process.env.CLOUDWAYS_UPLOADS_URL}${post.image}`}
+                    alt="post featured image"
+                    fill
+                  />
+                </div>
+                <div className="py-5 px-10 flex flex-col gap-5">
+                  <CardDescription>
+                    {getMonthName(post.createdAt.getMonth())}{' '}
+                    {post.createdAt.getDate()} {post.createdAt.getFullYear()}
+                  </CardDescription>
+                  <CardTitle>{post.title}</CardTitle>
+                  {parse(post.content.slice(4, 100))}...
+                </div>
+              </Card>
+            </Link>
+          ))}
+      </section>
     </main>
-  );
+  )
 }
