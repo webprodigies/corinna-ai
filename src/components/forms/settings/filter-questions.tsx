@@ -23,7 +23,7 @@ const FilterQuestions = ({ id }: Props) => {
   return (
     <Card className="w-full grid grid-cols-1 lg:grid-cols-2">
       <CardContent className="p-6 border-r-[1px]">
-        <CardTitle>Help Desk</CardTitle>
+        <CardTitle>Bot Questions</CardTitle>
         <form
           onSubmit={onAddFilterQuestions}
           className="flex flex-col gap-6 mt-10"

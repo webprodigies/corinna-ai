@@ -118,7 +118,6 @@ export const useChatTime = (createdAt: Date, roomId: string) => {
 
 export const useChatWindow = () => {
   const { chats, loading, setChats, chatRoom } = useChatContext()
-  const counterRef = useRef(1)
   const messageWindowRef = useRef<HTMLDivElement | null>(null)
   const { register, handleSubmit, reset } = useForm({
     resolver: zodResolver(ChatBotMessageSchema),
@@ -137,31 +136,31 @@ export const useChatWindow = () => {
   }, [chats, messageWindowRef])
 
   useEffect(() => {
-    console.log(counterRef)
-    if (chatRoom && counterRef.current === 1) {
-      console.log('Bind Event')
-      counterRef.current = 2
+    if (chatRoom) {
       pusherClient.subscribe(chatRoom)
       pusherClient.bind('realtime-mode', (data: any) => {
         setChats((prev) => [...prev, data.chat])
       })
 
       return () => {
-      
-        pusherClient.unsubscribe('realtime-mode')
+        pusherClient.unbind('realtime-mode')
+        pusherClient.unsubscribe(chatRoom)
       }
     }
   }, [chatRoom])
 
   const onHandleSentMessage = handleSubmit(async (values) => {
     try {
+      reset()
       const message = await onOwnerSendMessage(
         chatRoom!,
         values.content,
         'assistant'
       )
+      //WIP: Remove this line
       if (message) {
-        setChats((prev) => [...prev, message.message[0]])
+        //remove this
+        // setChats((prev) => [...prev, message.message[0]])
 
         await onRealTimeChat(
           chatRoom!,

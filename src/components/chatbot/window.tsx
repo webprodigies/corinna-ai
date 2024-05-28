@@ -17,8 +17,10 @@ import { Paperclip, Send } from 'lucide-react'
 import { Label } from '../ui/label'
 import { CardDescription, CardTitle } from '../ui/card'
 import Accordion from '../accordian'
+import UploadButton from '../upload-button'
 
 type Props = {
+  errors: any
   register: UseFormRegister<ChatBotMessageProps>
   chats: { role: 'assistant' | 'user'; content: string; link?: string }[]
   onChat(): void
@@ -53,6 +55,7 @@ type Props = {
 export const BotWindow = forwardRef<HTMLDivElement, Props>(
   (
     {
+      errors,
       register,
       chats,
       onChat,
@@ -67,6 +70,7 @@ export const BotWindow = forwardRef<HTMLDivElement, Props>(
     },
     ref
   ) => {
+    console.log(errors)
     return (
       <div className="h-[670px] w-[450px] flex flex-col bg-white rounded-xl mr-[80px] border-[1px] overflow-hidden">
         <div className="flex justify-between px-4 pt-4">
@@ -140,12 +144,12 @@ export const BotWindow = forwardRef<HTMLDivElement, Props>(
                     <Send />
                   </Button>
                 </div>
-                <Label htmlFor="upload">
+                <Label htmlFor="bot-image">
                   <Paperclip />
                   <Input
-                    type="file"
-                    id="upload"
                     {...register('image')}
+                    type="file"
+                    id="bot-image"
                     className="hidden"
                   />
                 </Label>
@@ -174,9 +178,7 @@ export const BotWindow = forwardRef<HTMLDivElement, Props>(
           </TabsContent>
         </TabsMenu>
         <div className="flex justify-center ">
-          <p className="text-gray-400 text-xs">
-            Powered By Web Prodigies
-          </p>
+          <p className="text-gray-400 text-xs">Powered By Web Prodigies</p>
         </div>
       </div>
     )

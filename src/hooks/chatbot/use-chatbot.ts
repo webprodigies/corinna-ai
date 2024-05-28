@@ -15,8 +15,12 @@ const upload = new UploadClient({
 })
 
 export const useChatBot = () => {
-
-  const { register, handleSubmit, reset } = useForm<ChatBotMessageProps>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<ChatBotMessageProps>({
     resolver: zodResolver(ChatBotMessageSchema),
   })
   const [currentBot, setCurrentBot] = useState<
@@ -103,16 +107,22 @@ export const useChatBot = () => {
   }, [])
 
   const onStartChatting = handleSubmit(async (values) => {
-    reset()
+    console.log('ALL VALUES', values)
+
     if (values.image.length) {
+      console.log('IMAGE fROM ', values.image[0])
       const uploaded = await upload.uploadFile(values.image[0])
-      setOnChats((prev: any) => [
-        ...prev,
-        {
-          role: 'user',
-          content: uploaded.uuid,
-        },
-      ])
+      if (!onRealTime?.mode) {
+        setOnChats((prev: any) => [
+          ...prev,
+          {
+            role: 'user',
+            content: uploaded.uuid,
+          },
+        ])
+      }
+
+      console.log('🟡 RESPONSE FROM UC', uploaded.uuid)
       setOnAiTyping(true)
       const response = await onAiChatBotAssistant(
         currentBotId!,
@@ -134,15 +144,19 @@ export const useChatBot = () => {
         }
       }
     }
+    reset()
 
     if (values.content) {
-      setOnChats((prev: any) => [
-        ...prev,
-        {
-          role: 'user',
-          content: values.content,
-        },
-      ])
+      if (!onRealTime?.mode) {
+        setOnChats((prev: any) => [
+          ...prev,
+          {
+            role: 'user',
+            content: values.content,
+          },
+        ])
+      }
+
       setOnAiTyping(true)
 
       const response = await onAiChatBotAssistant(
@@ -179,6 +193,7 @@ export const useChatBot = () => {
     loading,
     setOnChats,
     onRealTime,
+    errors,
   }
 }
 
@@ -194,17 +209,26 @@ export const useRealTime = (
     >
   >
 ) => {
+  const counterRef = useRef(1)
+
   useEffect(() => {
     pusherClient.subscribe(chatRoom)
     pusherClient.bind('realtime-mode', (data: any) => {
-      setChats((prev: any) => [
-        ...prev,
-        {
-          role: data.chat.role,
-          content: data.chat.message,
-        },
-      ])
+      console.log('✅', data)
+      if (counterRef.current !== 1) {
+        setChats((prev: any) => [
+          ...prev,
+          {
+            role: data.chat.role,
+            content: data.chat.message,
+          },
+        ])
+      }
+      counterRef.current += 1
     })
-    return () => pusherClient.unsubscribe('realtime-mode')
+    return () => {
+      pusherClient.unbind('realtime-mode')
+      pusherClient.unsubscribe(chatRoom)
+    }
   }, [])
 }
